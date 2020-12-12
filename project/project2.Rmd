@@ -1,0 +1,324 @@
+---
+title: "Project 2: Modeling, Testing, and Predicting"
+author: "Rohan Singeetham, RSS2927"
+date: '2020-12-11'
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE,fig.align="center",warning=FALSE,message=FALSE,fig.width=8, fig.height=5, linewidth=60)
+options(tibble.width = 100,width = 100)
+library(tidyverse)
+```
+
+
+## Introduction
+Heart disease affects 1 in 4 Americans and is the leading cause of death in the United States. In order to understand the relationship of different variables on certain indicators of cardiovascular health, this Heart Disease dataset was selected. The dataset looks at 303 participants ranging from ages 29 to 77 (inclusive).
+
+Though the dataset utilized has 14 distinct variables, the variables that will be inspected are age (in years), sex (where 1 indicates male and 0 indicates female), cp (chest pain, where 1 = typical angina, 2 = atypical angina, 3 = non-anginal pain, and 4 = asymptomatic), trestbps (resting blood pressure mm/Hg), chol (cholestoral in mg/dL), fbs (fasting blood sugar, 1 indicating a value greater than 120 mg/dl, and 0 indicating less than 120 mg/dl), restecg (ECG results when resting), exang (exercise induced angina), slope (slope of peak ST segment on ECG), thalach (maximum heart rate achieved), oldpeak (which is the ST depression- on an EKG- as a result of exercise relative to rest), ca (number of vessels highlighted by fluoroscopy),thal (thalium stress test result), and target (which indicates the presence of heart disease based on the diameter of the blood vessel; where 0 indicates less than 50% of the blood vessel narrowing and 1 indicates, greater than 50% of the blood vessel narrowing).
+
+```{r}
+library(readr)
+
+#Dataset utilized
+heart_data<- read_csv("heart.csv")
+max(heart_data$age)
+min(heart_data$age)
+```
+
+
+##1. Manova
+```{r}
+#MANOVA test perfromed on heart data
+manova1 <- manova(cbind(trestbps, thalach, oldpeak) ~ cp, data = heart_data)
+summary(manova1)
+
+#Univariate Anova test performed on heart data
+summary.aov(manova1)
+```
+
+
+```{r}
+#post-hoc t-tests 
+
+#trestbps
+pairwise.t.test(heart_data$trestbps, heart_data$cp, p.adj = "none")
+
+#thalach
+pairwise.t.test(heart_data$thalach, heart_data$cp, p.adj = "none")
+
+#oldpeak
+pairwise.t.test(heart_data$oldpeak, heart_data$cp, p.adj = "none")
+```
+
+```{r}
+#Probability of at least one Type I Error
+#1 Manova + 3 Anova + 9 t-tests
+1-(0.95^13)
+
+#Bonferri correction
+0.05/13
+
+```
+####*A Manova test was conducted to determine the effect of cp (chestpain) on the variables: trestbps (resting blood pressure), thalach (maximum heart rate achieved), and oldpeak (ST depression induced by exercise relative to rest). The Manova determines that these variables did significantly differ, Pillai trace = .095, pseudo F(3, 299) = 10.494, p < 0.0001. The univariate ANOVAs for trestbps and oldpeak was not significant, F(1, 301) =  0.6838, p = 0.4089, and F(1, 301) =  6.8558, p = 0.4089, respectively. The univariate ANOVA for thalach was significant, F(1, 301) =  28.854, p < 0.0001. Post hoc analysis was performed conducting pairwise comparisons to determine which chestpain differed in trestbps , thalach, and oldpeak. The probability of of at least one type I error is 0.4866579 and the Bonferri correction is 0.003846154.*
+
+
+##2. Randomization Test 
+
+2. (10 pts) Perform some kind of randomization test on your data (that makes sense). The statistic can be anything you want (mean difference, correlation, F-statistic/ANOVA, chi-squared), etc. State null and alternative hypotheses, perform the test, and interpret the results (7). Create a plot visualizing the null distribution and the test statistic (3).
+
+
+```{r}
+#male vs female
+ggplot(heart_data,aes(thalach,fill=sex))+geom_histogram(bins=6.5)+
+facet_wrap(~sex,ncol=2)+theme(legend.position="none")
+
+#mean diff
+heart_data%>%group_by(sex) %>% summarize(means=mean(thalach)) %>% summarize(`mean_diff`=diff(means))
+```
+
+```{r}
+summary(aov(thalach~sex,data=heart_data))
+
+obs_F<-2.163647	 #this is the observed F-statistic
+
+Fs<-replicate(5000,{
+new<-heart_data%>%mutate(thalach=sample(thalach)) 
+
+  SSW<- new%>%group_by(sex)%>%summarize(SSW=sum((thalach-mean(thalach))^2))%>% summarize(sum(SSW))%>%pull
+  SSB<- new%>%mutate(mean=mean(thalach))%>%group_by(sex)%>%mutate(groupmean=mean(thalach))%>%summarize(SSB=sum((mean-groupmean)^2))%>%summarize(sum(SSB))%>%pull
+  (SSB/1)/(SSW/301) 
+})
+
+hist(Fs, prob=T); abline(v = obs_F, col="red",add=T)
+
+#p-value
+mean(Fs>2.163647)
+```
+
+
+```{r}
+#Independent-samplest test for comparison
+t.test(data=heart_data,thalach~sex)
+```
+
+
+####*The null hypothesis is that there is no difference in the maximum heart rate achieved between males and females. The alternative hypothesis is that there is a difference in the maximum heart rate achieved between males and females. The mean difference between the two groups was determined to be 2.163647. We fail to reject the null hypothesis after running the permuation test and determining the p-value.*
+
+##3.Linear Regression Model
+```{r}
+heart_data$chol_new<- heart_data$chol-mean(heart_data$chol)
+heart_data$oldpeak_new<- heart_data$oldpeak-mean(heart_data$oldpeak)
+
+fit2 <- lm(chol_new ~ oldpeak_new * fbs, data=heart_data); summary(fit2)
+```
+
+```{r}
+#Plot
+ggplot(heart_data, aes(x=oldpeak, y=chol,group=fbs))+geom_point(aes(color=fbs))+
+geom_smooth(method="lm",formula=y~1,se=F,fullrange=T,aes(color=fbs))+
+xlab("ST depression as a result of exercise relative to rest") + ylab("Cholestoral (mg/dL)")
+```
+
+```{r}
+#assumptions (linearity, homoskedsaticity)
+resids<-fit2$residuals
+fitvals<-fit2$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color='darkgreen')
+```
+
+```{r}
+#Normality
+ggplot()+geom_histogram(aes(resids), bins=20)
+```
+
+####*When viewing the histogram, it can be concluded that normality has been met.*
+
+```{r}
+library(lmtest)
+library(sandwich)
+
+#H0: homoskedastic
+bptest(fit2) 
+
+#robust standard errors
+#uncorrected SEs
+summary(fit2)$coef[,1:2]
+
+#corrected SE
+coeftest(fit2, vcov = vcovHC(fit2))[,1:2]
+```
+####*The intercept and coefficient remain the same when comparing the standard errors of the the uncorrected and corrected SEs. There is an increase in the corrected standard errors when comparing against the uncorrected ones. Additionally, given that the p value of the Breusch-Pagan test is greater than 0.05, homoskedasticity can be confirmed (indicating there is not much noise).*
+
+```{r}
+summary(fit2)$r.sq
+```
+####*The proportion of the variation in the outcome explained by the model is 0.003612751.*
+
+##4.Bootstrapped Standard Errors 
+
+```{r}
+fit2 <- lm(chol_new ~ oldpeak_new * fbs, data=heart_data); summary(fit2)
+samp_distn <- replicate(5000, {
+  boot_dat <- heart_data[sample(nrow(heart_data), replace=TRUE),]
+  fit3 <- lm(chol_new ~ oldpeak_new * fbs, data=boot_dat)
+  coef(fit3)
+})
+
+samp_distn%>%t%>%as.data.frame%>%summarize_all(sd)
+```
+####*The bootstrapped standard erros for the intercept, oldpeak, trestbps, and the interaction between oldpeak and trestbps are 3.198491, 3.000234, 8.32487, 7.686553, respetively. When compared, all of the SEs, with the exception of fbs (fasting blood sugar), fall between the original SEs and the robust SEs.*
+
+###5.Logistic Regression Model
+```{r}
+class_diag<-function(probs,truth){
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]; truth <- truth[ord]
+  TPR=cumsum(truth)/max(1,sum(truth))
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+  data.frame(acc,sens,spec,ppv,auc)
+} 
+
+#regression and coefficient estimates
+reg1 <- glm(target ~ sex + chol, data = heart_data, family = "binomial")
+coeftest(reg1)
+exp(coef(reg1))
+
+#predicted probability
+prob4 <- predict(reg1, type = "response")
+heart_data$prob4 <- predict(reg1, type="response")
+
+#class diagnostics
+#accuracy, sensitivity, specificity, and ppv
+class_diag(prob4, heart_data$target) 
+
+#confusion matrix
+table(predict = prob4 > 0.5, truth = heart_data$fbs) %>% addmargins()
+```
+####*The calculated class diagnostics are 0.3927393, 0.3550725, 0.4242424, 0.3402778, and 0.3171498 for acc, sens, spec, ppv, and auc, respectively. This was conduced through using the class_diag function but can also be calculated using the values from the confusion matrix.*
+```{r}
+
+#density of log-odds (logit)
+heart_data$logit<-predict(reg1) 
+
+heart_data$target<-factor(heart_data$target,levels=c(1,0))
+
+ggplot(heart_data, aes(logit, fill=target)) + geom_density(alpha=.3) + geom_vline(xintercept=0,lty=2)
+
+```
+
+```{r}
+library(plotROC)
+library(tidyverse)
+library(lmtest)
+library(pROC)
+
+#ROC
+sens<-function(p,data=heart_data, y=target) mean(heart_data[heart_data$target==1,]$prob4>p)
+spec<-function(p,data=heart_data, y=target) mean(heart_data[heart_data$target==0,]$prob4<p)
+sensitivity<-sapply(seq(0,1,.01),sens,heart_data)
+specificity<-sapply(seq(0,1,.01),spec,heart_data)
+
+ROC1<-data.frame(sensitivity,specificity,cutoff=seq(0,1,.01))
+
+ROC1$TPR<-sensitivity
+ROC1$FPR<-1-specificity
+ROC1%>%ggplot(aes(FPR,TPR))+geom_path(size=1.5)+geom_segment(aes(x=0,y=0,xend=1,yend=1),lty=2) + scale_x_continuous(limits = c(0,1))
+
+ROCplot<-ggplot(heart_data)+geom_roc(aes(d=target,m=prob4), n.cuts=0) +
+  geom_segment(aes(x=0,xend=1,y=0,yend=1),lty=2)
+calc_auc(ROCplot)
+
+```
+
+```{r}
+#10-fold CV
+set.seed(1234)
+k=5
+data1 <- heart_data[sample(nrow(heart_data)), ]
+folds <- cut(seq(1:nrow(heart_data)), breaks = k, labels = F) 
+diags <- NULL
+for (i in 1:k) {
+  train <- data1[folds != i, ]
+  test <- data1[folds == i, ]
+  truth <- test$target
+  fit3 <- glm(target ~ sex + chol, data = heart_data, family = "binomial")
+  prob2 <- predict(fit3, newdata = test, type = "response")
+  preds <- ifelse(prob2 > 0.5, 1, 0)
+  diags <- rbind(diags, class_diag(prob2, truth))
+}
+
+apply(diags,2,mean)
+```
+
+####*Given that the area under the curve (AUC) was calculated to be 0.6854544, the model would be considered poor (an AUC between 0.9-1 would be "great").The accuracy (acc) is determined to 0.6075410, the sensitivity (sens) is 0.6476157, the specificity (specs) is 0.5752330, the positive predictive value (ppv) is 0.5569600. This would indicate that sex and cholestoral are not the greatest predictors of heart disease/vessel narrowing, further supported by the 0.6075 accuracy.*
+
+###6. Logistic Regression Including All Variables
+```{r}
+#lasso 
+library(glmnet)
+y<-as.matrix(heart_data$target) #grab response
+x<-model.matrix(target~.,data=heart_data)[,-1] #grab predictors
+head(x)
+x<-scale(x)
+
+cv<-cv.glmnet(x,y,family="binomial")
+lasso<-glmnet(x,y,family="binomial",lambda=cv$lambda.1se)
+coef(lasso)
+```
+
+
+```{r}
+set.seed(1234)
+k=10
+
+data <- heart_data %>% sample_frac #put rows of dataset in random order
+folds <- ntile(1:nrow(data),n=10) #create fold labels
+
+diags<-NULL
+for(i in 1:k){
+  train <- data[folds!=i,] #create training set (all but fold i)
+  test <- data[folds==i,] #create test set (just fold i)
+  truth <- test$target #save truth labels from fold i
+  fit <- lm(target ~ + cp + slope + oldpeak + exang + thalach + exang + thal, data = heart_data, family = "binomial")
+  probs <- predict(fit, newdata=test, type="response")
+  diags<-rbind(diags,class_diag(probs,truth))
+}
+diags%>%summarize_all(mean)
+```
+####*The Lasso Regression yields a better model in that the AUC falls into a significantly better range, to 0.8656677 ("good") though the accuracy does decrease to 0.455914. Based on the lasso regression run, cp, slope, oldpeak, exang, thalach, exang, and thal are the best predictors of target (binary variable, outcome is either 1 or 0).*
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

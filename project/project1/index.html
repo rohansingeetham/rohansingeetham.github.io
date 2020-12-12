@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Rohan Singeetham" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project 1: Exploratory Data Analysis</title>
+    <meta name="generator" content="Hugo 0.79.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project1/">Project 1: Exploratory Data Analysis</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         December 11, 2020 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="data-wrangling-and-data-exploration" class="section level2">
+<h2>Data Wrangling and Data Exploration</h2>
+<div id="introduction" class="section level3">
+<h3>Introduction</h3>
+<p>Educational equity remains a broad concern worldwide and in the United States. In order to undertsand what variables affect educational outcomes in high school students in the United States, the State Education and U.S. State Public-School Expenditures datasets were selected. Specifically, I am looking to interpret the relationship between the amount of money spent towards education and performance on standarized test amongst test takers. I am assuming that more money invested into the state's education system (i.e, school funding, teacher salary, etc.) will result in better test scores due to the resources made available via funding allocations.</p>
+<p>The variables that will be inspected are region (grouped by states in the United States), SATV and SATM (average verbal and math components of the Scholastic Aptitude Test- SAT- by state), dollars (state spending on public education in thousands/student), pay (average teacher's salary in thousands), education (per-capita education expenditures), income (per-capita income), and state (all U.S. states including Washinton D.C.).</p>
+</div>
+<div id="tidying-rearranging-widelong" class="section level3">
+<h3>1. Tidying: Rearranging Wide/Long</h3>
+<pre class="r"><code>library(readr)
+library(tidyverse)
+
+# Datasets utilized Education and Related Statistics for the
+# U.S. States
+edustate &lt;- read_csv(&quot;State Education .csv&quot;)
+edustate &lt;- select(edustate, -c(percent))
+
+# U.S. State Public-School Expenditures
+publicschool &lt;- read_csv(&quot;Public School Expenditures.csv&quot;)
+publicschool &lt;- select(publicschool, -c(young, urban))
+
+# Data is already tidy, utlizing pivot_wider() function to
+# &#39;untidy&#39; then tidy again
+fulldata &lt;- full_join(edustate, publicschool, by = c(state = &quot;state&quot;))
+
+# Making combined data untidy using &#39;pivot_wider()&#39;
+untidy &lt;- fulldata %&gt;% pivot_wider(names_from = &quot;region&quot;, values_from = &quot;pop&quot;)
+
+# Making combined data tidy again using &#39;pivot_longer()&#39;
+untidy %&gt;% pivot_longer(cols = c(&quot;ESC&quot;, &quot;PAC&quot;, &quot;MTN&quot;, &quot;WSC&quot;, 
+    &quot;NE&quot;, &quot;SA&quot;, &quot;ENC&quot;, &quot;WNC&quot;, &quot;MA&quot;), names_to = &quot;region&quot;, values_to = &quot;pop&quot;) %&gt;% 
+    na.omit()</code></pre>
+<pre><code>## # A tibble: 51 x 9
+##    state  SATV  SATM dollars   pay education income region   pop
+##    &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;
+##  1 AL      470   514    3.65    27       112   2337 ESC     4041
+##  2 AK      438   476    7.89    43       372   4146 PAC      550
+##  3 AZ      445   497    4.23    30       207   3027 MTN     3665
+##  4 AR      470   511    3.33    23       134   2322 WSC     2351
+##  5 CA      419   484    4.83    39       273   3968 PAC    29760
+##  6 CO      456   513    4.81    31       192   3340 MTN     3294
+##  7 CT      430   471    7.91    43       193   4256 NE      3287
+##  8 DE      433   470    6.02    35       248   3795 SA       666
+##  9 DC      409   441    8.21    39       246   4425 SA       607
+## 10 FL      418   466    5.15    30       191   3191 SA     12938
+## # … with 41 more rows</code></pre>
+</div>
+<div id="joiningmerging" class="section level3">
+<h3>2. Joining/Merging</h3>
+<pre class="r"><code>library(dplyr)
+fulldata &lt;- full_join(edustate, publicschool, by = c(state = &quot;state&quot;))
+glimpse(fulldata)</code></pre>
+<pre><code>## Rows: 51
+## Columns: 9
+## $ state     &lt;chr&gt; &quot;AL&quot;, &quot;AK&quot;, &quot;AZ&quot;, &quot;AR&quot;, &quot;CA&quot;, &quot;CO&quot;, &quot;CT&quot;, &quot;DE&quot;, &quot;DC&quot;, &quot;FL&quot;,…
+## $ region    &lt;chr&gt; &quot;ESC&quot;, &quot;PAC&quot;, &quot;MTN&quot;, &quot;WSC&quot;, &quot;PAC&quot;, &quot;MTN&quot;, &quot;NE&quot;, &quot;SA&quot;, &quot;SA&quot;,…
+## $ pop       &lt;dbl&gt; 4041, 550, 3665, 2351, 29760, 3294, 3287, 666, 607, 12938, …
+## $ SATV      &lt;dbl&gt; 470, 438, 445, 470, 419, 456, 430, 433, 409, 418, 401, 404,…
+## $ SATM      &lt;dbl&gt; 514, 476, 497, 511, 484, 513, 471, 470, 441, 466, 443, 481,…
+## $ dollars   &lt;dbl&gt; 3.648, 7.887, 4.231, 3.334, 4.826, 4.809, 7.914, 6.016, 8.2…
+## $ pay       &lt;dbl&gt; 27, 43, 30, 23, 39, 31, 43, 35, 39, 30, 29, 32, 25, 34, 32,…
+## $ education &lt;dbl&gt; 112, 372, 207, 134, 273, 192, 193, 248, 246, 191, 156, 212,…
+## $ income    &lt;dbl&gt; 2337, 4146, 3027, 2322, 3968, 3340, 4256, 3795, 4425, 3191,…</code></pre>
+<p>The &quot;full_join()&quot; join function was utilized to preserve all variables and observations. Additionally, given that the datasets were joined using the common variable &quot;state&quot; (U.S. States and Washington D.C) there were no N.A.s in the final data set (full data) because all observations had an entry for each variable.</p>
+</div>
+<div id="wrangling" class="section level3">
+<h3>3. Wrangling</h3>
+<pre class="r"><code># Mutate function adds the variable &#39;TotalSAT&#39; to &#39;fulldata&#39;
+# set by combining the SAT verbal and mathematics sections
+fulldata &lt;- fulldata %&gt;% mutate(TotalSAT = SATV + SATM)</code></pre>
+<p>The &quot;fulldata&quot; dataset was mutated to create the variable &quot;TotalSAT&quot; which is the addition of the math and verbal SAT portions to yield the total SAT score.</p>
+<pre class="r"><code># 1: Looking at relationship between amount spent on public
+# education (in $1000s/student) and overall SAT score by
+# state (arranged greatest to lowest average SAT score)
+fulldata %&gt;% select(state, dollars, TotalSAT) %&gt;% arrange(desc(dollars), 
+    desc(TotalSAT))</code></pre>
+<pre><code>## # A tibble: 51 x 3
+##    state dollars TotalSAT
+##    &lt;chr&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+##  1 NJ       9.16      891
+##  2 NY       8.5       882
+##  3 DC       8.21      850
+##  4 CT       7.91      901
+##  5 AK       7.89      914
+##  6 RI       6.99      883
+##  7 PA       6.53      883
+##  8 MA       6.35      900
+##  9 MD       6.18      908
+## 10 DE       6.02      903
+## # … with 41 more rows</code></pre>
+<pre class="r"><code># 2: Determing the minimum, maximum, mean, and median of
+# amount spent on public education (in $1000s/student)
+fulldata %&gt;% summarize(sd(dollars), min(dollars), max(dollars), 
+    mean(dollars), median(dollars))</code></pre>
+<pre><code>## # A tibble: 1 x 5
+##   `sd(dollars)` `min(dollars)` `max(dollars)` `mean(dollars)` `median(dollars)`
+##           &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;             &lt;dbl&gt;
+## 1          1.38           2.99           9.16            5.18              5.04</code></pre>
+<p>Though it was expected that increased state spending on public education was yield better SAT scores, there is no clear/distinct relationship between these two variables. The second code shows the range of money spent on public education by observing standard deviation, minimum, maxium, mean, and median. Based on the result, the mean fall close to the median of dollars (in $1000s/student) spent on public education.</p>
+<pre class="r"><code># 3: Grouping states by region and summarizing by mean
+# dollars spent, mean income, and mean SAT score
+fulldata %&gt;% group_by(region) %&gt;% summarize(mean_fund = mean(dollars), 
+    mean_income = mean(income), mean_SAT = mean(TotalSAT))</code></pre>
+<pre><code>## # A tibble: 9 x 4
+##   region mean_fund mean_income mean_SAT
+##   &lt;chr&gt;      &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;
+## 1 ENC         5.39       3588      959.
+## 2 ESC         3.77       2410.     996.
+## 3 MA          8.06       3841.     885.
+## 4 MTN         4.34       3071.     975.
+## 5 NE          6.40       3466.     899.
+## 6 PAC         5.61       3726.     910.
+## 7 SA          5.55       3168.     877.
+## 8 WNC         4.47       3144.    1043.
+## 9 WSC         3.83       2716.     962.</code></pre>
+<pre class="r"><code># 4: Filtering states by region &#39;WNC&#39; (West North Central),
+# given that this region had the greatest mean SAT score.
+fulldata %&gt;% group_by(state) %&gt;% filter(region == &quot;WNC&quot;) %&gt;% 
+    summarize(mean_fund = mean(dollars), mean_income = mean(income), 
+        mean_SAT = mean(TotalSAT))</code></pre>
+<pre><code>## # A tibble: 7 x 4
+##   state mean_fund mean_income mean_SAT
+##   &lt;chr&gt;     &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;
+## 1 IA         4.84        3265     1088
+## 2 KS         5.01        3303     1040
+## 3 MN         5.26        3341     1019
+## 4 MO         4.42        3257      995
+## 5 ND         3.68        2730     1069
+## 6 NE         4.38        3239     1030
+## 7 SD         3.73        2876     1061</code></pre>
+<p>The states were grouped by region in order to see the difference in mean overall SAT scores across the United States. The WNC region (West North Central) had the highest mean overall SAT score and the MA region (Midatlantic) had the lowest mean overall SAT score. All but one state in the WNC region scored above a 1000 on the SAT examination.</p>
+<pre class="r"><code># 5: Grouping observation by state and summarizing by mean
+# income, teacher salary, and mean SAT score
+fulldata %&gt;% group_by(state) %&gt;% summarize(mean_income = income, 
+    teacher_salary = pay, mean_SAT = mean(TotalSAT)) %&gt;% arrange(desc(mean_income), 
+    desc(teacher_salary), desc(mean_SAT))</code></pre>
+<pre><code>## # A tibble: 51 x 4
+##    state mean_income teacher_salary mean_SAT
+##    &lt;chr&gt;       &lt;dbl&gt;          &lt;dbl&gt;    &lt;dbl&gt;
+##  1 DC           4425             39      850
+##  2 CT           4256             43      901
+##  3 NY           4151             42      882
+##  4 AK           4146             43      914
+##  5 IL           3981             34      994
+##  6 CA           3968             39      903
+##  7 NV           3957             32      921
+##  8 NJ           3954             38      891
+##  9 MA           3835             36      900
+## 10 DE           3795             35      903
+## # … with 41 more rows</code></pre>
+<pre class="r"><code># 6: Grouping observations by pay and summarizing by
+# education, teacher salary, and mean SAT score, with teacher
+# salary and SAT score arranged from greatest to lowest to
+# see if teacher salary and pre-capita expenditures affect
+# SAT score
+fulldata %&gt;% group_by(pay) %&gt;% summarize(teacher_salary = mean(pay), 
+    education_per_capita = mean(education), mean_SAT = mean(TotalSAT)) %&gt;% 
+    arrange(desc(teacher_salary), desc(mean_SAT))</code></pre>
+<pre><code>## # A tibble: 20 x 4
+##      pay teacher_salary education_per_capita mean_SAT
+##    &lt;dbl&gt;          &lt;dbl&gt;                &lt;dbl&gt;    &lt;dbl&gt;
+##  1    43             43                 282.     908.
+##  2    42             42                 261      882 
+##  3    39             39                 260.     876.
+##  4    38             38                 231.     922.
+##  5    37             37                 180      883 
+##  6    36             36                 184.     892.
+##  7    35             35                 248      903 
+##  8    34             34                 189      994 
+##  9    33             33                 229.     987 
+## 10    32             32                 203.     907.
+## 11    31             31                 197      931.
+## 12    30             30                 199      913 
+## 13    29             29                 177      939.
+## 14    28             28                 174.     948.
+## 15    27             27                 112      984 
+## 16    26             26                 185.     990 
+## 17    25             25                 186.     999.
+## 18    24             24                 132.     998.
+## 19    23             23                 156.    1025 
+## 20    22             22                 187     1061</code></pre>
+<pre class="r"><code># 7: Grouping observations by region and summarizing by
+# teacher salary and education funding to understand if
+# teachers get paid more by education funding. (utlized for
+# GGPlot #1)
+avgsalary &lt;- fulldata %&gt;% group_by(region) %&gt;% summarize(teacher_salary = mean(pay), 
+    education_funds = mean(education))
+
+# 8: Grouping observations by region and summarizing by
+# dollars ($1000s/student) invested per student and SAT score
+# (utlized for GGPlot #2)
+ggplot2values &lt;- fulldata %&gt;% group_by(region) %&gt;% summarize(dollars = mean(dollars), 
+    TotalSAT = mean(TotalSAT))</code></pre>
+<p>Generally, teachers were better compensated (higher salary) if the state's mean income was greater (though there are a handfull of outliers). Additionally, teachers tended to be better compensated if there was more per-capita education expenditures, though there are a few outliers in this trend.</p>
+<pre class="r"><code># 9: Determing the sd, minimum, maximum, mean, and median of
+# SAT scores grouped by region to understand the range of
+# test scores in each region
+fulldata %&gt;% group_by(region) %&gt;% summarize(sd(TotalSAT), min(TotalSAT), 
+    max(TotalSAT), mean(TotalSAT), median(TotalSAT), sd(dollars))</code></pre>
+<pre><code>## # A tibble: 9 x 7
+##   region `sd(TotalSAT)` `min(TotalSAT)` `max(TotalSAT)` `mean(TotalSAT)`
+##   &lt;chr&gt;           &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
+## 1 ENC             58.0              867            1019             959.
+## 2 ESC              9.85             984            1008             996.
+## 3 MA               4.93             882             891             885.
+## 4 MTN             34.6              921            1031             975.
+## 5 NE              16.0              883             928             899.
+## 6 PAC             16.0              885             923             910.
+## 7 SA              35.5              834             933             877.
+## 8 WNC             31.8              995            1088            1043.
+## 9 WSC             59.4              874            1001             962.
+## # … with 2 more variables: `median(TotalSAT)` &lt;dbl&gt;, `sd(dollars)` &lt;dbl&gt;</code></pre>
+<pre class="r"><code># 10:
+fulldata %&gt;% summarize(n_distinct(TotalSAT))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `n_distinct(TotalSAT)`
+##                    &lt;int&gt;
+## 1                     45</code></pre>
+<p>Most regions in the United States, have high values of standard deviaition for test scores (base on states in each respective region), with the exception of two region (ESC and MA, relative to other regions). This could indicate that region may not be an indicator in state's similarity of educational resources available, though state spending on public education yielded much lower and closer standard deviations.</p>
+</div>
+<div id="visualizing" class="section level3">
+<h3>4. Visualizing</h3>
+<pre class="r"><code># Correlation heatmap of numeric variables
+library(tidyverse)
+library(ggplot2)
+
+fulldata %&gt;% select_if(is.numeric) %&gt;% cor %&gt;% as.data.frame %&gt;% 
+    rownames_to_column %&gt;% pivot_longer(-1) %&gt;% ggplot(aes(rowname, 
+    name, fill = value)) + geom_tile() + geom_text(aes(label = round(value, 
+    2)), size = 3) + xlab(&quot;&quot;) + ylab(&quot;&quot;) + theme(axis.text.x = element_text(angle = 45, 
+    hjust = 1)) + coord_fixed() + scale_fill_gradient2(low = &quot;yellow&quot;, 
+    mid = &quot;orange&quot;, high = &quot;red&quot;)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /> The strongest correlation is held by the variables TotalSAT and SATM (0.99) as well as TotalSAT and SATV (0.99. Given that TotalSAT is a result of the addition between SATV and SATM this correlation is understandable. Excluding these relationships, the variables Income (per-capita income) Pay (teacher's salary) have the second strongest correlation (0.87). This can be attributed to the idea, that state's with a greater overall income, would naturally have higher compensated individuals. The variables Income and Dollars (state spending on public education per student) have the largest negative correlation (-0.51), indicating that as the amount of money spent on public education increases,the TotalSAT score decreases.</p>
+<pre class="r"><code># GGPlot #1: &#39;Teacher Salary in Relation to Region and
+# Education Expenditures&#39;
+avgsalary %&gt;% ggplot() + geom_point(aes(x = teacher_salary, y = education_funds, 
+    color = region), size = 3) + scale_x_continuous(breaks = round(seq(min(avgsalary$teacher_salary), 
+    max(avgsalary$teacher_salary), by = 1), 1)) + scale_y_continuous(breaks = round(seq(min(avgsalary$education_funds), 
+    max(avgsalary$education_funds), by = 10), 1)) + xlab(&quot;Average Teacher Salary (in $1000s)&quot;) + 
+    ylab(&quot;Per-Capita Education Expenditures ($)&quot;) + ggtitle(&quot;Teacher Salary in Relation to Region and Education Expenditures&quot;) + 
+    theme_grey()</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /> The scatterplot above shows the relationship between the average teacher salary and per-capita education expenditures, plotted by region. Generally, as the per-capita education expenditures, the average teacher salary increases. So, as education funding increases, teachers are more likley to be better compensated (though there are outliers based on region, and even state).</p>
+<pre class="r"><code># GGPlot #2: &#39;SAT Score in Relation to Money Invested (by
+# thousands/student) in State Public School Education by and
+# Region&#39;
+fulldata %&gt;% ggplot(aes(x = TotalSAT, y = dollars, fill = region)) + 
+    geom_bar(stat = &quot;summary&quot;, position = &quot;dodge&quot;) + scale_x_continuous(lim = c(800, 
+    1100, 1000)) + theme_dark()</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /> The barplot above shows the relationship between TotalSAT (overall SAT score) and dollars (state spending on public education, in $1000s per student) by region. It was expected that as state spending on public education increased, so would student performance on the SAT standardized test. However, there is not clear relationship between these two variables, however it can be seen that the states in the WNC region performed higher overall compared to states in other regions.</p>
+</div>
+<div id="dimensionality-reduction" class="section level3">
+<h3>5. Dimensionality Reduction</h3>
+<pre class="r"><code>new_fulldata &lt;- fulldata %&gt;% select_if(is.numeric) %&gt;% scale
+# not more observations than variables
+new_fulldata_pca &lt;- princomp(new_fulldata)
+
+# Summarized Results
+summary(new_fulldata_pca, loadings = T)</code></pre>
+<pre><code>## Importance of components:
+##                          Comp.1    Comp.2    Comp.3    Comp.4    Comp.5
+## Standard deviation     2.107985 1.3495610 0.9462134 0.6275305 0.4206820
+## Proportion of Variance 0.566559 0.2322177 0.1141533 0.0502088 0.0225641
+## Cumulative Proportion  0.566559 0.7987766 0.9129299 0.9631387 0.9857028
+##                            Comp.6      Comp.7       Comp.8
+## Standard deviation     0.29454551 0.159303946 1.288271e-08
+## Proportion of Variance 0.01106152 0.003235663 2.116044e-17
+## Cumulative Proportion  0.99676434 1.000000000 1.000000e+00
+## 
+## Loadings:
+##           Comp.1 Comp.2 Comp.3 Comp.4 Comp.5 Comp.6 Comp.7 Comp.8
+## pop        0.189         0.951         0.194  0.107              
+## SATV      -0.401 -0.363        -0.136        -0.148  0.711  0.387
+## SATM      -0.374 -0.421  0.143 -0.100               -0.676  0.434
+## dollars    0.389 -0.233 -0.219 -0.446  0.661  0.333              
+## pay        0.416 -0.266        -0.220        -0.831 -0.112       
+## education  0.247 -0.489 -0.108  0.810  0.171                     
+## income     0.353 -0.408        -0.230 -0.693  0.397  0.125       
+## TotalSAT  -0.391 -0.397        -0.118                      -0.813</code></pre>
+<pre class="r"><code># Square to convert SDs to eigenvalues
+eigval &lt;- new_fulldata_pca$sdev^2
+
+# Proportion of var explained by each PC
+varprop = round(eigval/sum(eigval), 2)
+
+# Number of PCs to keep
+ggplot() + geom_bar(aes(y = varprop, x = 1:8), stat = &quot;identity&quot;) + 
+    xlab(&quot;&quot;) + geom_path(aes(y = varprop, x = 1:8)) + geom_text(aes(x = 1:8, 
+    y = varprop, label = round(varprop, 2)), vjust = 1, col = &quot;white&quot;, 
+    size = 5) + scale_y_continuous(breaks = seq(0, 0.6, 0.2), 
+    labels = scales::percent) + scale_x_continuous(breaks = 1:10)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Cumulative Proportion of Variance
+round(cumsum(eigval)/sum(eigval), 2)</code></pre>
+<pre><code>## Comp.1 Comp.2 Comp.3 Comp.4 Comp.5 Comp.6 Comp.7 Comp.8 
+##   0.57   0.80   0.91   0.96   0.99   1.00   1.00   1.00</code></pre>
+<pre class="r"><code>eigval[1:8]</code></pre>
+<pre><code>##       Comp.1       Comp.2       Comp.3       Comp.4       Comp.5       Comp.6 
+## 4.443600e+00 1.821315e+00 8.953197e-01 3.937945e-01 1.769733e-01 8.675706e-02 
+##       Comp.7       Comp.8 
+## 2.537775e-02 1.659642e-16</code></pre>
+<pre class="r"><code># Data with respect to the first 2 PCs
+edu_df &lt;- data.frame(PC1 = new_fulldata_pca$scores[, 1], PC2 = new_fulldata_pca$scores[, 
+    2])
+ggplot(edu_df, aes(PC1, PC2)) + geom_point()</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Plot of Loadings
+new_fulldata_pca$loadings[1:8, 1:2] %&gt;% as.data.frame %&gt;% rownames_to_column %&gt;% 
+    ggplot() + geom_hline(aes(yintercept = 0), lty = 2) + geom_vline(aes(xintercept = 0), 
+    lty = 2) + ylab(&quot;PC2&quot;) + xlab(&quot;PC1&quot;) + geom_segment(aes(x = 0, 
+    y = 0, xend = Comp.1, yend = Comp.2), arrow = arrow(), col = &quot;red&quot;) + 
+    geom_label(aes(x = Comp.1 * 1.1, y = Comp.2 * 1.1, label = rowname))</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-11-3.png" width="672" style="display: block; margin: auto;" /> Based on the plot, it appears that the variables dollars and pay are strongly correlted with each other. This indicates that as state spending on public education increases, so does teacher annual salary.</p>
+</div>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

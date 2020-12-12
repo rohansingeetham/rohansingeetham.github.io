@@ -1,0 +1,29 @@
+---
+title: Blog Post
+author: ''
+date: '2020-12-11'
+slug: test-post
+categories: []
+tags: []
+description: ''
+---
+
+# Heading of my post
+
+Content of my post 
+
+## Subheading
+
+More content 
+
+```{r}
+hist(quakes$mag)
+```
+
+```{python}
+r.quakes.mag.mean()
+```
+
+<center>
+![](/post/2020-12-11-test-post_files/Screen Shot 2020-12-10 at 8.44.59 PM.png){width=40%}
+</center>

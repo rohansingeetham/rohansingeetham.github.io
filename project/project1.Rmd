@@ -1,0 +1,179 @@
+---
+title: 'Project 1: Exploratory Data Analysis'
+author: "Rohan Singeetham, RSS2972"
+date: '2020-12-11'
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+## Data Wrangling and Data Exploration
+    
+###Introduction
+Educational equity remains a broad concern worldwide and in the United States. In order to undertsand what variables affect educational outcomes in high school students in the United States, the State Education and U.S. State Public-School Expenditures datasets were selected. Specifically, I am looking to interpret the relationship between the amount of money spent towards education and performance on standarized test amongst test takers. I am assuming that more money invested into the state's education system (i.e, school funding, teacher salary, etc.) will result in better test scores due to the resources made available via funding allocations. 
+
+The variables that will be inspected are region (grouped by states in the United States), SATV and SATM (average verbal and math components of the Scholastic Aptitude Test- SAT- by state), dollars (state spending on public education in thousands/student), pay (average teacher's salary in thousands), education (per-capita education expenditures), income (per-capita income), and state (all U.S. states including Washinton D.C.).
+
+### 1. Tidying: Rearranging Wide/Long
+```{r}
+
+library(readr)
+library(tidyverse)
+
+#Datasets utilized
+#Education and Related Statistics for the U.S. States
+edustate<- read_csv("State Education .csv")
+edustate <- select(edustate,-c(percent))
+
+#U.S. State Public-School Expenditures
+publicschool <- read_csv("Public School Expenditures.csv")
+publicschool <- select(publicschool,-c(young, urban))
+
+#Data is already tidy, utlizing pivot_wider() function to "untidy" then tidy again
+fulldata <- full_join(edustate, publicschool,by=c("state"="state"))
+
+#Making combined data untidy using "pivot_wider()"
+untidy <- fulldata %>% pivot_wider(names_from="region", values_from="pop")
+
+#Making combined data tidy again using "pivot_longer()"
+untidy %>% pivot_longer(cols=c("ESC","PAC", "MTN", "WSC","NE","SA","ENC","WNC", "MA"), names_to="region", values_to="pop") %>% na.omit()
+```
+
+    
+### 2. Joining/Merging
+
+```{r}
+library(dplyr)
+fulldata <- full_join(edustate, publicschool,by=c("state"="state"))
+glimpse(fulldata)
+```
+
+The "full_join()" join function was utilized to preserve all variables and observations. Additionally, given that the datasets were joined using the common variable "state" (U.S. States and Washington D.C) there were no N.A.s in the final data set (full data) because all observations had an entry for each variable. 
+
+### 3. Wrangling
+
+```{r}
+#Mutate function adds the variable "TotalSAT" to 'fulldata' set by combining the SAT verbal and mathematics sections 
+fulldata %>% mutate(TotalSAT = SATV + SATM) -> fulldata
+```
+The "fulldata" dataset was mutated to create the variable "TotalSAT" which is the addition of the math and verbal SAT portions to yield the total SAT score.
+
+```{r}
+#1: Looking at relationship between amount spent on public education (in $1000s/student) and overall SAT score by state (arranged greatest to lowest average SAT score)
+fulldata %>% select(state, dollars, TotalSAT) %>% arrange(desc(dollars), desc(TotalSAT))
+
+#2: Determing the minimum, maximum, mean, and median of amount spent on public education (in $1000s/student)
+fulldata %>% summarize(sd(dollars), min(dollars), max(dollars), mean(dollars), median(dollars))
+```
+Though it was expected that increased state spending on public education was yield better SAT scores, there is no clear/distinct relationship between these two variables. The second code shows the range of money spent on public education by observing standard deviation, minimum, maxium, mean, and median. Based on the result, the mean fall close to the median of dollars (in $1000s/student) spent on public education.
+
+```{r}
+#3: Grouping states by region and summarizing by mean dollars spent, mean income, and mean SAT score
+fulldata %>% group_by(region) %>% summarize(mean_fund=mean(dollars), mean_income=mean(income), mean_SAT=mean(TotalSAT))
+
+#4: Filtering states by region 'WNC' (West North Central), given that this region had the greatest mean SAT score.
+fulldata %>% group_by(state) %>% filter(region == "WNC") %>% summarize(mean_fund=mean(dollars), mean_income=mean(income), mean_SAT=mean(TotalSAT))
+```
+The states were grouped by region in order to see the difference in mean overall SAT scores across the United States. The WNC region (West North Central) had the highest mean overall SAT score and the MA region (Midatlantic) had the lowest mean overall SAT score. All but one state in the WNC region scored above a 1000 on the SAT examination. 
+
+```{r}
+
+#5: Grouping observation by state and summarizing by mean income, teacher salary, and mean SAT score
+fulldata %>% group_by(state) %>% summarize(mean_income = income, teacher_salary = pay, mean_SAT=mean(TotalSAT)) %>% arrange(desc(mean_income), desc(teacher_salary),desc(mean_SAT))
+
+#6: Grouping observations by pay and summarizing by education, teacher salary, and mean SAT score, with teacher salary and SAT score arranged from greatest to lowest to see if teacher salary and pre-capita expenditures affect SAT score
+fulldata %>% group_by(pay) %>% summarize(teacher_salary = mean(pay), education_per_capita = mean(education), mean_SAT=mean(TotalSAT)) %>% arrange(desc(teacher_salary),desc(mean_SAT))
+
+#7: Grouping observations by region and summarizing by teacher salary and education funding to understand if teachers get paid more by education funding. (utlized for GGPlot #1)
+avgsalary<- fulldata %>% group_by(region) %>% summarize(teacher_salary = mean(pay), education_funds = mean(education))
+
+#8: Grouping observations by region and summarizing by dollars ($1000s/student) invested per student and SAT score (utlized for GGPlot #2)
+ggplot2values <- fulldata %>% group_by(region) %>% summarize(dollars = mean(dollars), TotalSAT = mean(TotalSAT))
+
+```
+
+Generally, teachers were better compensated (higher salary) if the state's mean income was greater (though there are a handfull of outliers). Additionally, teachers tended to be better compensated if there was more per-capita education expenditures, though there are a few outliers in this trend. 
+
+```{r}
+#9: Determing the sd, minimum, maximum, mean, and median of SAT scores grouped by region to understand the range of test scores in each region
+fulldata %>% group_by(region) %>% summarize(sd(TotalSAT), min(TotalSAT), max(TotalSAT), mean(TotalSAT), median(TotalSAT), sd(dollars))
+
+#10: 
+fulldata %>% summarize(n_distinct(TotalSAT))
+```
+Most regions in the United States, have high values of standard deviaition for test scores (base on states in each respective region), with the exception of two region (ESC and MA, relative to other regions). This could indicate that region may not be an indicator in state's similarity of educational resources available, though state spending on public education yielded much lower and closer standard deviations. 
+
+### 4. Visualizing
+```{r}
+#Correlation heatmap of numeric variables
+library(tidyverse)
+library(ggplot2)
+
+fulldata %>% select_if(is.numeric) %>% cor %>% as.data.frame %>%
+rownames_to_column %>% pivot_longer(-1) %>%
+ggplot(aes(rowname,name,fill=value))+geom_tile()+
+geom_text(aes(label=round(value,2)),size = 3)+
+xlab("") + ylab("") + theme(axis.text.x = element_text(angle = 45, hjust=1)) + coord_fixed() + scale_fill_gradient2(low="yellow", mid="orange", high="red")
+```
+The strongest correlation is held by the variables TotalSAT and SATM (0.99) as well as TotalSAT and SATV (0.99. Given that TotalSAT is a result of the addition between SATV and SATM this correlation is understandable. Excluding these relationships, the variables Income (per-capita income) Pay (teacher's salary) have the second strongest correlation (0.87). This can be attributed to the idea, that state's with a greater overall income, would naturally have higher compensated individuals. The variables Income and Dollars (state spending on public education per student) have the largest negative correlation (-0.51), indicating that as the amount of money spent on public education increases,the TotalSAT score decreases. 
+
+```{r}
+
+#GGPlot #1: "Teacher Salary in Relation to Region and Education Expenditures"
+avgsalary %>% ggplot() + geom_point(aes(x = teacher_salary, y = education_funds, color = region), size=3) + scale_x_continuous(breaks = round(seq(min(avgsalary$teacher_salary), max(avgsalary$teacher_salary), by = 1),1)) + scale_y_continuous(breaks = round(seq(min(avgsalary$education_funds), max(avgsalary$education_funds), by = 10),1)) + xlab("Average Teacher Salary (in $1000s)") +ylab("Per-Capita Education Expenditures ($)") + ggtitle("Teacher Salary in Relation to Region and Education Expenditures") + theme_grey()
+```
+The scatterplot above shows the relationship between the average teacher salary and per-capita education expenditures, plotted by region. Generally, as the per-capita education expenditures, the average teacher salary increases. So, as education funding increases, teachers are more likley to be better compensated (though there are outliers based on region, and even state).
+
+```{r}
+#GGPlot #2: "SAT Score in Relation to Money Invested (by thousands/student) in State Public School Education by and Region"
+fulldata %>% ggplot(aes(x= TotalSAT, y= dollars, fill=region)) + 
+geom_bar(stat="summary", position="dodge") + scale_x_continuous(lim=c(800,1100,1000)) + theme_dark()
+
+```
+The barplot above shows the relationship between TotalSAT (overall SAT score) and dollars (state spending on public education, in \$1000s per student) by region. It was expected that as state spending on public education increased, so would student performance on the SAT standardized test. However, there is not clear relationship between these two variables, however it can be seen that the states in the WNC region performed higher overall compared to states in other regions. 
+
+### 5. Dimensionality Reduction
+    
+```{r}
+new_fulldata <- fulldata %>% select_if(is.numeric) %>% scale
+#not more observations than variables
+new_fulldata_pca <- princomp(new_fulldata)
+
+#Summarized Results
+summary(new_fulldata_pca,loadings=T)
+
+#Square to convert SDs to eigenvalues
+eigval <- new_fulldata_pca$sdev^2
+
+#Proportion of var explained by each PC
+varprop=round(eigval/sum(eigval),2)
+
+#Number of PCs to keep
+ggplot()+geom_bar(aes(y=varprop,x=1:8),stat="identity")+xlab("")+geom_path(aes(y=varprop,x=1:8)) + geom_text(aes(x=1:8,y=varprop,label=round(varprop,2)),vjust=1,col="white",size=5) + scale_y_continuous(breaks=seq(0,.6,.2),labels = scales::percent) + scale_x_continuous(breaks=1:10)
+
+#Cumulative Proportion of Variance
+round(cumsum(eigval)/sum(eigval),2)
+eigval[1:8]
+
+#Data with respect to the first 2 PCs
+edu_df <-data.frame(PC1=new_fulldata_pca$scores[,1],PC2=new_fulldata_pca$scores[,2])
+ggplot(edu_df, aes(PC1,PC2)) + geom_point()
+
+#Plot of Loadings
+new_fulldata_pca$loadings[1:8,1:2]%>%as.data.frame%>%rownames_to_column%>%
+ggplot()+geom_hline(aes(yintercept=0),lty=2)+
+ geom_vline(aes(xintercept=0),lty=2)+ylab("PC2")+xlab("PC1")+
+ geom_segment(aes(x=0,y=0,xend=Comp.1,yend=Comp.2),arrow=arrow(),col="red")+
+ geom_label(aes(x=Comp.1*1.1,y=Comp.2*1.1,label=rowname))
+```
+Based on the plot, it appears that the variables dollars and pay are strongly correlted with each other. This indicates that as state spending on public education increases, so does teacher annual salary. 

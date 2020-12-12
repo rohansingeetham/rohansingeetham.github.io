@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Projects on My Website</title>
+    <link>/project/</link>
+    <description>Recent content in Projects on My Website</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Fri, 11 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="/project/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Project 1: Exploratory Data Analysis</title>
+      <link>/project/project1/</link>
+      <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project1/</guid>
+      <description>Data Wrangling and Data Exploration Introduction Educational equity remains a broad concern worldwide and in the United States. In order to undertsand what variables affect educational outcomes in high school students in the United States, the State Education and U.S. State Public-School Expenditures datasets were selected. Specifically, I am looking to interpret the relationship between the amount of money spent towards education and performance on standarized test amongst test takers.</description>
+    </item>
+    
+    <item>
+      <title>Project 2: Modeling, Testing, and Predicting</title>
+      <link>/project/project2/</link>
+      <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project2/</guid>
+      <description>Introduction Heart disease affects 1 in 4 Americans and is the leading cause of death in the United States. In order to understand the relationship of different variables on certain indicators of cardiovascular health, this Heart Disease dataset was selected. The dataset looks at 303 participants ranging from ages 29 to 77 (inclusive).
+Though the dataset utilized has 14 distinct variables, the variables that will be inspected are age (in years), sex (where 1 indicates male and 0 indicates female), cp (chest pain, where 1 = typical angina, 2 = atypical angina, 3 = non-anginal pain, and 4 = asymptomatic), trestbps (resting blood pressure mm/Hg), chol (cholestoral in mg/dL), fbs (fasting blood sugar, 1 indicating a value greater than 120 mg/dl, and 0 indicating less than 120 mg/dl), restecg (ECG results when resting), exang (exercise induced angina), slope (slope of peak ST segment on ECG), thalach (maximum heart rate achieved), oldpeak (which is the ST depression- on an EKG- as a result of exercise relative to rest), ca (number of vessels highlighted by fluoroscopy),thal (thalium stress test result), and target (which indicates the presence of heart disease based on the diameter of the blood vessel; where 0 indicates less than 50% of the blood vessel narrowing and 1 indicates, greater than 50% of the blood vessel narrowing).</description>
+    </item>
+    
+  </channel>
+</rss>

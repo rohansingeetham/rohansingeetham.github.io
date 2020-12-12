@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Rohan Singeetham" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project 2: Modeling, Testing, and Predicting</title>
+    <meta name="generator" content="Hugo 0.79.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project2/">Project 2: Modeling, Testing, and Predicting</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         December 11, 2020 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Heart disease affects 1 in 4 Americans and is the leading cause of death in the United States. In order to understand the relationship of different variables on certain indicators of cardiovascular health, this Heart Disease dataset was selected. The dataset looks at 303 participants ranging from ages 29 to 77 (inclusive).</p>
+<p>Though the dataset utilized has 14 distinct variables, the variables that will be inspected are age (in years), sex (where 1 indicates male and 0 indicates female), cp (chest pain, where 1 = typical angina, 2 = atypical angina, 3 = non-anginal pain, and 4 = asymptomatic), trestbps (resting blood pressure mm/Hg), chol (cholestoral in mg/dL), fbs (fasting blood sugar, 1 indicating a value greater than 120 mg/dl, and 0 indicating less than 120 mg/dl), restecg (ECG results when resting), exang (exercise induced angina), slope (slope of peak ST segment on ECG), thalach (maximum heart rate achieved), oldpeak (which is the ST depression- on an EKG- as a result of exercise relative to rest), ca (number of vessels highlighted by fluoroscopy),thal (thalium stress test result), and target (which indicates the presence of heart disease based on the diameter of the blood vessel; where 0 indicates less than 50% of the blood vessel narrowing and 1 indicates, greater than 50% of the blood vessel narrowing).</p>
+<pre class="r"><code>library(readr)
+
+#Dataset utilized
+heart_data&lt;- read_csv(&quot;heart.csv&quot;)
+max(heart_data$age)</code></pre>
+<pre><code>## [1] 77</code></pre>
+<pre class="r"><code>min(heart_data$age)</code></pre>
+<pre><code>## [1] 29</code></pre>
+</div>
+<div id="manova" class="section level2">
+<h2>1. Manova</h2>
+<pre class="r"><code>#MANOVA test perfromed on heart data
+manova1 &lt;- manova(cbind(trestbps, thalach, oldpeak) ~ cp, data = heart_data)
+summary(manova1)</code></pre>
+<pre><code>## Df Pillai approx F num Df den Df Pr(&gt;F)
+## cp 1 0.095259 10.494 3 299 1.393e-06 ***
+## Residuals 301
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>#Univariate Anova test performed on heart data
+summary.aov(manova1)</code></pre>
+<pre><code>## Response trestbps :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## cp 1 211 210.54 0.6838 0.4089
+## Residuals 301 92681 307.91
+##
+## Response thalach :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## cp 1 13860 13859.9 28.854 1.564e-07 ***
+## Residuals 301 144583 480.3
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response oldpeak :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## cp 1 9.07 9.0665 6.8558 0.009282 **
+## Residuals 301 398.06 1.3225
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>#post-hoc t-tests 
+
+#trestbps
+pairwise.t.test(heart_data$trestbps, heart_data$cp, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  heart_data$trestbps and heart_data$cp 
+## 
+##   0      1      2     
+## 1 0.2056 -      -     
+## 2 0.4876 0.5214 -     
+## 3 0.0241 0.0047 0.0105
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>#thalach
+pairwise.t.test(heart_data$thalach, heart_data$cp, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  heart_data$thalach and heart_data$cp 
+## 
+##   0       1      2     
+## 1 1.2e-09 -      -     
+## 2 3.2e-07 0.0713 -     
+## 3 0.0013  0.2273 0.9443
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>#oldpeak
+pairwise.t.test(heart_data$oldpeak, heart_data$cp, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  heart_data$oldpeak and heart_data$cp 
+## 
+##   0       1       2      
+## 1 7.4e-09 -       -      
+## 2 9.9e-05 0.01342 -      
+## 3 0.97371 0.00011 0.02102
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>#Probability of at least one Type I Error
+#1 Manova + 3 Anova + 9 t-tests
+1-(0.95^13)</code></pre>
+<pre><code>## [1] 0.4866579</code></pre>
+<pre class="r"><code>#Bonferri correction
+0.05/13</code></pre>
+<pre><code>## [1] 0.003846154</code></pre>
+<div id="a-manova-test-was-conducted-to-determine-the-effect-of-cp-chestpain-on-the-variables-trestbps-resting-blood-pressure-thalach-maximum-heart-rate-achieved-and-oldpeak-st-depression-induced-by-exercise-relative-to-rest.-the-manova-determines-that-these-variables-did-significantly-differ-pillai-trace-.095-pseudo-f3-299-10.494-p-0.0001.-the-univariate-anovas-for-trestbps-and-oldpeak-was-not-significant-f1-301-0.6838-p-0.4089-and-f1-301-6.8558-p-0.4089-respectively.-the-univariate-anova-for-thalach-was-significant-f1-301-28.854-p-0.0001.-post-hoc-analysis-was-performed-conducting-pairwise-comparisons-to-determine-which-chestpain-differed-in-trestbps-thalach-and-oldpeak.-the-probability-of-of-at-least-one-type-i-error-is-0.4866579-and-the-bonferri-correction-is-0.003846154." class="section level4">
+<h4><em>A Manova test was conducted to determine the effect of cp (chestpain) on the variables: trestbps (resting blood pressure), thalach (maximum heart rate achieved), and oldpeak (ST depression induced by exercise relative to rest). The Manova determines that these variables did significantly differ, Pillai trace = .095, pseudo F(3, 299) = 10.494, p &lt; 0.0001. The univariate ANOVAs for trestbps and oldpeak was not significant, F(1, 301) = 0.6838, p = 0.4089, and F(1, 301) = 6.8558, p = 0.4089, respectively. The univariate ANOVA for thalach was significant, F(1, 301) = 28.854, p &lt; 0.0001. Post hoc analysis was performed conducting pairwise comparisons to determine which chestpain differed in trestbps , thalach, and oldpeak. The probability of of at least one type I error is 0.4866579 and the Bonferri correction is 0.003846154.</em></h4>
+</div>
+</div>
+<div id="randomization-test" class="section level2">
+<h2>2. Randomization Test</h2>
+<ol start="2" style="list-style-type: decimal">
+<li>(10 pts) Perform some kind of randomization test on your data (that makes sense). The statistic can be anything you want (mean difference, correlation, F-statistic/ANOVA, chi-squared), etc. State null and alternative hypotheses, perform the test, and interpret the results (7). Create a plot visualizing the null distribution and the test statistic (3).</li>
+</ol>
+<pre class="r"><code>#male vs female
+ggplot(heart_data,aes(thalach,fill=sex))+geom_histogram(bins=6.5)+
+facet_wrap(~sex,ncol=2)+theme(legend.position=&quot;none&quot;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#mean diff
+heart_data%&gt;%group_by(sex) %&gt;% summarize(means=mean(thalach)) %&gt;% summarize(`mean_diff`=diff(means))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   mean_diff
+##       &lt;dbl&gt;
+## 1     -2.16</code></pre>
+<pre class="r"><code>summary(aov(thalach~sex,data=heart_data))</code></pre>
+<pre><code>##              Df Sum Sq Mean Sq F value Pr(&gt;F)
+## sex           1    307   307.0   0.584  0.445
+## Residuals   301 158136   525.4</code></pre>
+<pre class="r"><code>obs_F&lt;-2.163647  #this is the observed F-statistic
+
+Fs&lt;-replicate(5000,{
+new&lt;-heart_data%&gt;%mutate(thalach=sample(thalach)) 
+
+  SSW&lt;- new%&gt;%group_by(sex)%&gt;%summarize(SSW=sum((thalach-mean(thalach))^2))%&gt;% summarize(sum(SSW))%&gt;%pull
+  SSB&lt;- new%&gt;%mutate(mean=mean(thalach))%&gt;%group_by(sex)%&gt;%mutate(groupmean=mean(thalach))%&gt;%summarize(SSB=sum((mean-groupmean)^2))%&gt;%summarize(sum(SSB))%&gt;%pull
+  (SSB/1)/(SSW/301) 
+})
+
+hist(Fs, prob=T); abline(v = obs_F, col=&quot;red&quot;,add=T)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#p-value
+mean(Fs&gt;2.163647)</code></pre>
+<pre><code>## [1] 0.14</code></pre>
+<pre class="r"><code>#Independent-samplest test for comparison
+t.test(data=heart_data,thalach~sex)</code></pre>
+<pre><code>##
+## Welch Two Sample t-test
+##
+## data: thalach by sex
+## t = 0.8178, df = 219.79, p-value = 0.4144
+## alternative hypothesis: true difference in means is not
+equal to 0
+## 95 percent confidence interval:
+## -3.050537 7.377831
+## sample estimates:
+## mean in group 0 mean in group 1
+## 151.1250 148.9614</code></pre>
+<div id="the-null-hypothesis-is-that-there-is-no-difference-in-the-maximum-heart-rate-achieved-between-males-and-females.-the-alternative-hypothesis-is-that-there-is-a-difference-in-the-maximum-heart-rate-achieved-between-males-and-females.-the-mean-difference-between-the-two-groups-was-determined-to-be-2.163647.-we-fail-to-reject-the-null-hypothesis-after-running-the-permuation-test-and-determining-the-p-value." class="section level4">
+<h4><em>The null hypothesis is that there is no difference in the maximum heart rate achieved between males and females. The alternative hypothesis is that there is a difference in the maximum heart rate achieved between males and females. The mean difference between the two groups was determined to be 2.163647. We fail to reject the null hypothesis after running the permuation test and determining the p-value.</em></h4>
+</div>
+</div>
+<div id="linear-regression-model" class="section level2">
+<h2>3.Linear Regression Model</h2>
+<pre class="r"><code>heart_data$chol_new&lt;- heart_data$chol-mean(heart_data$chol)
+heart_data$oldpeak_new&lt;- heart_data$oldpeak-mean(heart_data$oldpeak)
+
+fit2 &lt;- lm(chol_new ~ oldpeak_new * fbs, data=heart_data); summary(fit2)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = chol_new ~ oldpeak_new * fbs, data =
+heart_data)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -117.51 -35.55 -5.70 29.10 316.89
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) -0.2817 3.2371 -0.087 0.931
+## oldpeak_new 2.0170 2.7535 0.733 0.464
+## fbs 1.8467 8.4007 0.220 0.826
+## oldpeak_new:fbs 3.1268 7.8157 0.400 0.689
+##
+## Residual standard error: 52 on 299 degrees of freedom
+## Multiple R-squared: 0.003613, Adjusted R-squared:
+-0.006384
+## F-statistic: 0.3614 on 3 and 299 DF, p-value: 0.7809</code></pre>
+<pre class="r"><code>#Plot
+ggplot(heart_data, aes(x=oldpeak, y=chol,group=fbs))+geom_point(aes(color=fbs))+
+geom_smooth(method=&quot;lm&quot;,formula=y~1,se=F,fullrange=T,aes(color=fbs))+
+xlab(&quot;ST depression as a result of exercise relative to rest&quot;) + ylab(&quot;Cholestoral (mg/dL)&quot;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#assumptions (linearity, homoskedsaticity)
+resids&lt;-fit2$residuals
+fitvals&lt;-fit2$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color=&#39;darkgreen&#39;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Normality
+ggplot()+geom_histogram(aes(resids), bins=20)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;" /></p>
+<div id="when-viewing-the-histogram-it-can-be-concluded-that-normality-has-been-met." class="section level4">
+<h4><em>When viewing the histogram, it can be concluded that normality has been met.</em></h4>
+<pre class="r"><code>library(lmtest)
+library(sandwich)
+
+#H0: homoskedastic
+bptest(fit2) </code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  fit2
+## BP = 2.7678, df = 3, p-value = 0.4288</code></pre>
+<pre class="r"><code>#robust standard errors
+#uncorrected SEs
+summary(fit2)$coef[,1:2]</code></pre>
+<pre><code>##                   Estimate Std. Error
+## (Intercept)     -0.2816704   3.237135
+## oldpeak_new      2.0169963   2.753537
+## fbs              1.8467032   8.400724
+## oldpeak_new:fbs  3.1268095   7.815702</code></pre>
+<pre class="r"><code>#corrected SE
+coeftest(fit2, vcov = vcovHC(fit2))[,1:2]</code></pre>
+<pre><code>##                   Estimate Std. Error
+## (Intercept)     -0.2816704   3.261045
+## oldpeak_new      2.0169963   3.101140
+## fbs              1.8467032   8.485697
+## oldpeak_new:fbs  3.1268095   8.099177</code></pre>
+</div>
+<div id="the-intercept-and-coefficient-remain-the-same-when-comparing-the-standard-errors-of-the-the-uncorrected-and-corrected-ses.-there-is-an-increase-in-the-corrected-standard-errors-when-comparing-against-the-uncorrected-ones.-additionally-given-that-the-p-value-of-the-breusch-pagan-test-is-greater-than-0.05-homoskedasticity-can-be-confirmed-indicating-there-is-not-much-noise." class="section level4">
+<h4><em>The intercept and coefficient remain the same when comparing the standard errors of the the uncorrected and corrected SEs. There is an increase in the corrected standard errors when comparing against the uncorrected ones. Additionally, given that the p value of the Breusch-Pagan test is greater than 0.05, homoskedasticity can be confirmed (indicating there is not much noise).</em></h4>
+<pre class="r"><code>summary(fit2)$r.sq</code></pre>
+<pre><code>## [1] 0.003612751</code></pre>
+</div>
+<div id="the-proportion-of-the-variation-in-the-outcome-explained-by-the-model-is-0.003612751." class="section level4">
+<h4><em>The proportion of the variation in the outcome explained by the model is 0.003612751.</em></h4>
+</div>
+</div>
+<div id="bootstrapped-standard-errors" class="section level2">
+<h2>4.Bootstrapped Standard Errors</h2>
+<pre class="r"><code>fit2 &lt;- lm(chol_new ~ oldpeak_new * fbs, data=heart_data); summary(fit2)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = chol_new ~ oldpeak_new * fbs, data =
+heart_data)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -117.51 -35.55 -5.70 29.10 316.89
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) -0.2817 3.2371 -0.087 0.931
+## oldpeak_new 2.0170 2.7535 0.733 0.464
+## fbs 1.8467 8.4007 0.220 0.826
+## oldpeak_new:fbs 3.1268 7.8157 0.400 0.689
+##
+## Residual standard error: 52 on 299 degrees of freedom
+## Multiple R-squared: 0.003613, Adjusted R-squared:
+-0.006384
+## F-statistic: 0.3614 on 3 and 299 DF, p-value: 0.7809</code></pre>
+<pre class="r"><code>samp_distn &lt;- replicate(5000, {
+  boot_dat &lt;- heart_data[sample(nrow(heart_data), replace=TRUE),]
+  fit3 &lt;- lm(chol_new ~ oldpeak_new * fbs, data=boot_dat)
+  coef(fit3)
+})
+
+samp_distn%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
+<pre><code>##   (Intercept) oldpeak_new      fbs oldpeak_new:fbs
+## 1    3.284595    3.048741 8.322165        7.713645</code></pre>
+<div id="the-bootstrapped-standard-erros-for-the-intercept-oldpeak-trestbps-and-the-interaction-between-oldpeak-and-trestbps-are-3.198491-3.000234-8.32487-7.686553-respetively.-when-compared-all-of-the-ses-with-the-exception-of-fbs-fasting-blood-sugar-fall-between-the-original-ses-and-the-robust-ses." class="section level4">
+<h4><em>The bootstrapped standard erros for the intercept, oldpeak, trestbps, and the interaction between oldpeak and trestbps are 3.198491, 3.000234, 8.32487, 7.686553, respetively. When compared, all of the SEs, with the exception of fbs (fasting blood sugar), fall between the original SEs and the robust SEs.</em></h4>
+</div>
+<div id="logistic-regression-model" class="section level3">
+<h3>5.Logistic Regression Model</h3>
+<pre class="r"><code>class_diag&lt;-function(probs,truth){
+  tab&lt;-table(factor(probs&gt;.5,levels=c(&quot;FALSE&quot;,&quot;TRUE&quot;)),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+  if(is.numeric(truth)==FALSE &amp; is.logical(truth)==FALSE) truth&lt;-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord&lt;-order(probs, decreasing=TRUE)
+  probs &lt;- probs[ord]; truth &lt;- truth[ord]
+  TPR=cumsum(truth)/max(1,sum(truth))
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  dup&lt;-c(probs[-1]&gt;=probs[-length(probs)], FALSE)
+  TPR&lt;-c(0,TPR[!dup],1); FPR&lt;-c(0,FPR[!dup],1)
+  n &lt;- length(TPR)
+  auc&lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+  data.frame(acc,sens,spec,ppv,auc)
+} 
+
+#regression and coefficient estimates
+reg1 &lt;- glm(target ~ sex + chol, data = heart_data, family = &quot;binomial&quot;)
+coeftest(reg1)</code></pre>
+<pre><code>##
+## z test of coefficients:
+##
+## Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 2.8131216 0.7102617 3.9607 7.474e-05 ***
+## sex -1.4847708 0.2904969 -5.1111 3.202e-07 ***
+## chol -0.0064188 0.0024610 -2.6082 0.009101 **
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>exp(coef(reg1))</code></pre>
+<pre><code>## (Intercept)         sex        chol 
+##  16.6618483   0.2265543   0.9936018</code></pre>
+<pre class="r"><code>#predicted probability
+prob4 &lt;- predict(reg1, type = &quot;response&quot;)
+heart_data$prob4 &lt;- predict(reg1, type=&quot;response&quot;)
+
+#class diagnostics
+#accuracy, sensitivity, specificity, and ppv
+class_diag(prob4, heart_data$target) </code></pre>
+<pre><code>##         acc      sens      spec       ppv       auc
+## 1 0.6072607 0.5757576 0.6449275 0.6597222 0.6828502</code></pre>
+<pre class="r"><code>#confusion matrix
+table(predict = prob4 &gt; 0.5, truth = heart_data$fbs) %&gt;% addmargins()</code></pre>
+<pre><code>##        truth
+## predict   0   1 Sum
+##   FALSE 135  24 159
+##   TRUE  123  21 144
+##   Sum   258  45 303</code></pre>
+<div id="the-calculated-class-diagnostics-are-0.3927393-0.3550725-0.4242424-0.3402778-and-0.3171498-for-acc-sens-spec-ppv-and-auc-respectively.-this-was-conduced-through-using-the-class_diag-function-but-can-also-be-calculated-using-the-values-from-the-confusion-matrix." class="section level4">
+<h4><em>The calculated class diagnostics are 0.3927393, 0.3550725, 0.4242424, 0.3402778, and 0.3171498 for acc, sens, spec, ppv, and auc, respectively. This was conduced through using the class_diag function but can also be calculated using the values from the confusion matrix.</em></h4>
+<pre class="r"><code>#density of log-odds (logit)
+heart_data$logit&lt;-predict(reg1) 
+
+heart_data$target&lt;-factor(heart_data$target,levels=c(1,0))
+
+ggplot(heart_data, aes(logit, fill=target)) + geom_density(alpha=.3) + geom_vline(xintercept=0,lty=2)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-16-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>library(plotROC)
+library(tidyverse)
+library(lmtest)
+library(pROC)
+
+#ROC
+sens&lt;-function(p,data=heart_data, y=target) mean(heart_data[heart_data$target==1,]$prob4&gt;p)
+spec&lt;-function(p,data=heart_data, y=target) mean(heart_data[heart_data$target==0,]$prob4&lt;p)
+sensitivity&lt;-sapply(seq(0,1,.01),sens,heart_data)
+specificity&lt;-sapply(seq(0,1,.01),spec,heart_data)
+
+ROC1&lt;-data.frame(sensitivity,specificity,cutoff=seq(0,1,.01))
+
+ROC1$TPR&lt;-sensitivity
+ROC1$FPR&lt;-1-specificity
+ROC1%&gt;%ggplot(aes(FPR,TPR))+geom_path(size=1.5)+geom_segment(aes(x=0,y=0,xend=1,yend=1),lty=2) + scale_x_continuous(limits = c(0,1))</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-17-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ROCplot&lt;-ggplot(heart_data)+geom_roc(aes(d=target,m=prob4), n.cuts=0) +
+  geom_segment(aes(x=0,xend=1,y=0,yend=1),lty=2)
+calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group AUC
+## 1     1     1  NA
+## 2     1     2  NA</code></pre>
+<pre class="r"><code>#10-fold CV
+set.seed(1234)
+k=5
+data1 &lt;- heart_data[sample(nrow(heart_data)), ]
+folds &lt;- cut(seq(1:nrow(heart_data)), breaks = k, labels = F) 
+diags &lt;- NULL
+for (i in 1:k) {
+  train &lt;- data1[folds != i, ]
+  test &lt;- data1[folds == i, ]
+  truth &lt;- test$target
+  fit3 &lt;- glm(target ~ sex + chol, data = heart_data, family = &quot;binomial&quot;)
+  prob2 &lt;- predict(fit3, newdata = test, type = &quot;response&quot;)
+  preds &lt;- ifelse(prob2 &gt; 0.5, 1, 0)
+  diags &lt;- rbind(diags, class_diag(prob2, truth))
+}
+
+apply(diags,2,mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.6075410 0.6476157 0.5752330 0.5569600 0.6854544</code></pre>
+</div>
+<div id="given-that-the-area-under-the-curve-auc-was-calculated-to-be-0.6854544-the-model-would-be-considered-poor-an-auc-between-0.9-1-would-be-great.the-accuracy-acc-is-determined-to-0.6075410-the-sensitivity-sens-is-0.6476157-the-specificity-specs-is-0.5752330-the-positive-predictive-value-ppv-is-0.5569600.-this-would-indicate-that-sex-and-cholestoral-are-not-the-greatest-predictors-of-heart-diseasevessel-narrowing-further-supported-by-the-0.6075-accuracy." class="section level4">
+<h4><em>Given that the area under the curve (AUC) was calculated to be 0.6854544, the model would be considered poor (an AUC between 0.9-1 would be &quot;great&quot;).The accuracy (acc) is determined to 0.6075410, the sensitivity (sens) is 0.6476157, the specificity (specs) is 0.5752330, the positive predictive value (ppv) is 0.5569600. This would indicate that sex and cholestoral are not the greatest predictors of heart disease/vessel narrowing, further supported by the 0.6075 accuracy.</em></h4>
+</div>
+</div>
+<div id="logistic-regression-including-all-variables" class="section level3">
+<h3>6. Logistic Regression Including All Variables</h3>
+<pre class="r"><code>#lasso 
+library(glmnet)
+y&lt;-as.matrix(heart_data$target) #grab response
+x&lt;-model.matrix(target~.,data=heart_data)[,-1] #grab predictors
+head(x)</code></pre>
+<pre><code>## age sex cp trestbps chol fbs restecg thalach exang
+oldpeak slope ca thal chol_new oldpeak_new
+## 1 63 1 3 145 233 1 0 150 0 2.3 0 0 1 -13.264026 1.260396
+## 2 37 1 2 130 250 0 1 187 0 3.5 0 0 2 3.735974 2.460396
+## 3 41 0 1 130 204 0 0 172 0 1.4 2 0 2 -42.264026 0.360396
+## 4 56 1 1 120 236 0 1 178 0 0.8 2 0 2 -10.264026
+-0.239604
+## 5 57 0 0 120 354 0 1 163 1 0.6 2 0 2 107.735974
+-0.439604
+## 6 57 1 0 140 192 0 1 148 0 0.4 1 0 1 -54.264026
+-0.639604
+## prob4 logit
+## 1 0.4582898 -0.16722941
+## 2 0.4313491 -0.27634900
+## 3 0.8181237 1.50368658
+## 4 0.4535132 -0.18648581
+## 5 0.6320140 0.54086673
+## 6 0.5239670 0.09594134</code></pre>
+<pre class="r"><code>x&lt;-scale(x)
+
+cv&lt;-cv.glmnet(x,y,family=&quot;binomial&quot;)
+lasso&lt;-glmnet(x,y,family=&quot;binomial&quot;,lambda=cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 18 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                     s0
+## (Intercept)  0.1794092
+## age          .        
+## sex          .        
+## cp           0.4478449
+## trestbps     .        
+## chol         .        
+## fbs          .        
+## restecg      .        
+## thalach      0.2841438
+## exang       -0.2843095
+## oldpeak     -0.3898925
+## slope        0.1017330
+## ca          -0.4051156
+## thal        -0.2447432
+## chol_new     .        
+## oldpeak_new  .        
+## prob4        0.1965100
+## logit        0.1122657</code></pre>
+<pre class="r"><code>set.seed(1234)
+k=10
+
+data &lt;- heart_data %&gt;% sample_frac #put rows of dataset in random order
+folds &lt;- ntile(1:nrow(data),n=10) #create fold labels
+
+diags&lt;-NULL
+for(i in 1:k){
+  train &lt;- data[folds!=i,] #create training set (all but fold i)
+  test &lt;- data[folds==i,] #create test set (just fold i)
+  truth &lt;- test$target #save truth labels from fold i
+  fit &lt;- lm(target ~ + cp + slope + oldpeak + exang + thalach + exang + thal, data = heart_data, family = &quot;binomial&quot;)
+  probs &lt;- predict(fit, newdata=test, type=&quot;response&quot;)
+  diags&lt;-rbind(diags,class_diag(probs,truth))
+}
+diags%&gt;%summarize_all(mean)</code></pre>
+<pre><code>##        acc sens spec      ppv       auc
+## 1 0.455914    1    0 0.455914 0.8656677</code></pre>
+<div id="the-lasso-regression-yields-a-better-model-in-that-the-auc-falls-into-a-significantly-better-range-to-0.8656677-good-though-the-accuracy-does-decrease-to-0.455914.-based-on-the-lasso-regression-run-cp-slope-oldpeak-exang-thalach-exang-and-thal-are-the-best-predictors-of-target-binary-variable-outcome-is-either-1-or-0." class="section level4">
+<h4><em>The Lasso Regression yields a better model in that the AUC falls into a significantly better range, to 0.8656677 (&quot;good&quot;) though the accuracy does decrease to 0.455914. Based on the lasso regression run, cp, slope, oldpeak, exang, thalach, exang, and thal are the best predictors of target (binary variable, outcome is either 1 or 0).</em></h4>
+<p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
+</div>
+</div>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
