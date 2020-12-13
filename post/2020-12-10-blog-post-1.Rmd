@@ -1,0 +1,62 @@
+---
+title: Crossing the Language Barrier
+author: ''
+date: '2020-12-10'
+slug: blog-post-1
+categories: []
+tags: []
+description: ''
+---
+
+# Python and R: Let's Close the Gap!
+While both Python and R are really useful languages on their own, sometimes they work best together. In computational biology, it may be easier to visualize data through using "reticulate" so that Python and R can communicate with one another. It sounds challenging at first, but it's actually quite straightforward!
+
+We'll start of with a simple example!
+```{r}
+#R Code Chuck 
+# "reticulate" is activated in R
+library(reticulate)
+
+# the object seasons is defined
+seasons <- "There are four seasons."
+```
+
+```{python}
+#Python Code Chuck
+seasons = "I think summer is my favorite!"
+
+# r. allows Python to access R-defined objects
+print(r.seasons,seasons) 
+```
+
+We can also do the opposite and access Python defined objects in R!
+
+```{r}
+# py. allows R to access Python-defined objects
+cat(c(seasons,py$seasons))
+```
+
+# Let's Do Some Modeling!
+
+The dataset "quakes" displays 1000 occurences of earthquakes near Fiji.
+
+```{python}
+import pandas as pd
+
+quakes = pd.read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/datasets/quakes.csv",index_col=0)
+
+# displays first five rows
+quakes.head()
+```
+
+
+Now let's model that data in R! The code below will generate a histogram displaying the frequency of different depths of earthquakes near Fiji!
+
+
+```{r}
+# generates histogram of the "depth" variable from the quakes dataset
+
+hist(quakes$depth, xlab = "Depth (km)", main = "Distribution of Earthquake Depths near Fiji", right = F, col = " dark red")
+```
+
+Based on the histogram, we can observe a biomodal distribution!

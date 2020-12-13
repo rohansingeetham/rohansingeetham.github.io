@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Rohan Singeetham" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../img/favicon.ico">
+    <title>Crossing the Language Barrier</title>
+    <meta name="generator" content="Hugo 0.79.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../../../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../../../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../../../../post/">BLOG</a></li>
+        
+        <li><a href="../../../../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../../../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../../../../post/2020/12/10/blog-post-1/">Crossing the Language Barrier</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         December 10, 2020 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="python-and-r-lets-close-the-gap" class="section level1">
+<h1>Python and R: Let's Close the Gap!</h1>
+<p>While both Python and R are really useful languages on their own, sometimes they work best together. In computational biology, it may be easier to visualize data through using &quot;reticulate&quot; so that Python and R can communicate with one another. It sounds challenging at first, but it's actually quite straightforward!</p>
+<p>We'll start of with a simple example!</p>
+<pre class="r"><code>#R Code Chuck 
+# &quot;reticulate&quot; is activated in R
+library(reticulate)
+
+# the object seasons is defined
+seasons &lt;- &quot;There are four seasons.&quot;</code></pre>
+<pre class="python"><code>#Python Code Chuck
+seasons = &quot;I think summer is my favorite!&quot;
+
+# r. allows Python to access R-defined objects
+print(r.seasons,seasons) </code></pre>
+<pre><code>## There are four seasons. I think summer is my favorite!</code></pre>
+<p>We can also do the opposite and access Python defined objects in R!</p>
+<pre class="r"><code># py. allows R to access Python-defined objects
+cat(c(seasons,py$seasons))</code></pre>
+<pre><code>## There are four seasons. I think summer is my favorite!</code></pre>
+</div>
+<div id="lets-do-some-modeling" class="section level1">
+<h1>Let's Do Some Modeling!</h1>
+<p>The dataset &quot;quakes&quot; displays 1000 occurences of earthquakes near Fiji.</p>
+<pre class="python"><code>import pandas as pd
+
+quakes = pd.read_csv(&quot;https://vincentarelbundock.github.io/Rdatasets/csv/datasets/quakes.csv&quot;,index_col=0)
+
+# displays first five rows
+quakes.head()</code></pre>
+<pre><code>##      lat    long  depth  mag  stations
+## 1 -20.42  181.62    562  4.8        41
+## 2 -20.62  181.03    650  4.2        15
+## 3 -26.00  184.10     42  5.4        43
+## 4 -17.97  181.66    626  4.1        19
+## 5 -20.42  181.96    649  4.0        11</code></pre>
+<p>Now let's model that data in R! The code below will generate a histogram displaying the frequency of different depths of earthquakes near Fiji!</p>
+<pre class="r"><code># generates histogram of the &quot;depth&quot; variable from the quakes dataset
+
+hist(quakes$depth, xlab = &quot;Depth (km)&quot;, main = &quot;Distribution of Earthquake Depths near Fiji&quot;, right = F, col = &quot; dark red&quot;)</code></pre>
+<p><img src="../../../../../post/2020-12-10-blog-post-1_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Based on the histogram, we can observe a biomodal distribution!</p>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../../../../js/docs.min.js"></script>
+<script src="../../../../../js/main.js"></script>
+
+<script src="../../../../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

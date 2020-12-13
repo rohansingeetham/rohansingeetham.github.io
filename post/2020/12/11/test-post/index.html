@@ -7,7 +7,7 @@
     <meta name="author" content="Rohan Singeetham" />
     
     <link rel="shortcut icon" type="image/x-icon" href="../../../../../img/favicon.ico">
-    <title>Blog Post</title>
+    <title>Using Python in Biology</title>
     <meta name="generator" content="Hugo 0.79.0" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="../../../../../css/main.css" />
@@ -54,7 +54,7 @@
       <div class="container">
         <div class="blog-post">
           <h3>
-            <strong><a href="../../../../../post/2020/12/11/test-post/">Blog Post</a></strong>
+            <strong><a href="../../../../../post/2020/12/11/test-post/">Using Python in Biology</a></strong>
           </h3>
         </div>
  
@@ -72,14 +72,25 @@
               
 
 
-<div id="heading-of-my-post" class="section level1">
-<h1>Heading of my post</h1>
+<div id="python-and-r" class="section level1">
+<h1>Python and R</h1>
+<p>While both Python and R are really useful languages on their own, sometimes they work best together. In computational biology, it may be easier to visualize data through using &quot;reticulate&quot; so that Python and R can communicate with one another. It sounds challenging at first, but it's actually quite straightforward!</p>
+<div id="in-the-following-example-we-will-be-looking-at-the-distribution-of-earthquakes-in-fiji" class="section level5">
+<h5>In the following example, we will be looking at the distribution of earthquakes in Fiji!</h5>
+<pre class="r"><code>#assigning dataset to the variable &quot;quakes&quot;
+quakes &lt;- quakes
+head(quakes)</code></pre>
+<pre><code>##      lat   long depth mag stations
+## 1 -20.42 181.62   562 4.8       41
+## 2 -20.62 181.03   650 4.2       15
+## 3 -26.00 184.10    42 5.4       43
+## 4 -17.97 181.66   626 4.1       19
+## 5 -20.42 181.96   649 4.0       11
+## 6 -19.68 184.31   195 4.0       12</code></pre>
 <p>Content of my post</p>
+</div>
 <div id="subheading" class="section level2">
 <h2>Subheading</h2>
-<p>More content</p>
-<pre class="r"><code>hist(quakes$mag)</code></pre>
-<p><img src="../../../../../post/2020-12-11-test-post_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 <pre class="python"><code>r.quakes.mag.mean()</code></pre>
 <pre><code>## 4.6204000000000001</code></pre>
 <center>

@@ -1,5 +1,5 @@
 ---
-title: Blog Post
+title: Using Python in Biology
 author: ''
 date: '2020-12-11'
 slug: test-post
@@ -8,17 +8,23 @@ tags: []
 description: ''
 ---
 
-# Heading of my post
+# Python and R
+While both Python and R are really useful languages on their own, sometimes they work best together. In computational biology, it may be easier to visualize data through using "reticulate" so that Python and R can communicate with one another. It sounds challenging at first, but it's actually quite straightforward!
+
+##### In the following example, we will be looking at the distribution of earthquakes in Fiji!
+
+```{r}
+#assigning dataset to the variable "quakes"
+quakes <- quakes
+head(quakes)
+
+```
+
 
 Content of my post 
 
 ## Subheading
 
-More content 
-
-```{r}
-hist(quakes$mag)
-```
 
 ```{python}
 r.quakes.mag.mean()
