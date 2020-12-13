@@ -8,8 +8,18 @@ tags: []
 description: ''
 ---
 
+<center>
+![](/post/2020-12-10-blog-post-1_files/summer image.jpg){width=80%}
+</center>
+
 # Python and R: Let's Close the Gap!
-While both Python and R are really useful languages on their own, sometimes they work best together. In computational biology, it may be easier to visualize data through using "reticulate" so that Python and R can communicate with one another. It sounds challenging at first, but it's actually quite straightforward!
+While both Python and R are really useful languages on their own, sometimes they work best together.
+
+WOAH! Two programming languages at once?
+
+I know...sounds crazy but hear me out!
+
+In certain situations, it may be more convenient and easier to visualize and analyze data through using the "reticulate" function so that Python and R can communicate with one another. This allows objects in a different programming language to called upon as needed. It sounds challenging at first, but it's actually quite straightforward!
 
 We'll start of with a simple example!
 ```{r}
@@ -23,7 +33,7 @@ seasons <- "There are four seasons."
 
 ```{python}
 #Python Code Chuck
-seasons = "I think summer is my favorite!"
+seasons = "I think summer is my favorite season!"
 
 # r. allows Python to access R-defined objects
 print(r.seasons,seasons) 
@@ -55,8 +65,7 @@ Now let's model that data in R! The code below will generate a histogram display
 
 ```{r}
 # generates histogram of the "depth" variable from the quakes dataset
-
-hist(quakes$depth, xlab = "Depth (km)", main = "Distribution of Earthquake Depths near Fiji", right = F, col = " dark red")
+hist(py$quakes$depth, xlab = "Depth (km)", main = "Distribution of Earthquake Depths near Fiji", right = F, col = " dark red")
 ```
 
 Based on the histogram, we can observe a biomodal distribution!

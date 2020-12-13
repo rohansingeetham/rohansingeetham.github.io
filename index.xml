@@ -32,9 +32,10 @@ Though the dataset utilized has 14 distinct variables, the variables that will b
       <pubDate>Thu, 10 Dec 2020 00:00:00 +0000</pubDate>
       
       <guid>/post/2020/12/10/blog-post-1/</guid>
-      <description>Python and R: Let&#39;s Close the Gap! While both Python and R are really useful languages on their own, sometimes they work best together. In computational biology, it may be easier to visualize data through using &amp;quot;reticulate&amp;quot; so that Python and R can communicate with one another. It sounds challenging at first, but it&#39;s actually quite straightforward!
-We&#39;ll start of with a simple example!
-#R Code Chuck # &amp;quot;reticulate&amp;quot; is activated in R library(reticulate) # the object seasons is defined seasons &amp;lt;- &amp;quot;There are four seasons.</description>
+      <description>Python and R: Let&#39;s Close the Gap! While both Python and R are really useful languages on their own, sometimes they work best together.
+WOAH! Two programming languages at once?
+I know...sounds crazy but hear me out!
+In certain situations, it may be more convenient and easier to visualize and analyze data through using the &amp;quot;reticulate&amp;quot; function so that Python and R can communicate with one another. This allows objects in a different programming language to called upon as needed.</description>
     </item>
     
     <item>

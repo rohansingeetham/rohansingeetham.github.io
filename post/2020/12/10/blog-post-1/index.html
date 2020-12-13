@@ -72,9 +72,15 @@
               
 
 
+<center>
+<img src="../../../../../post/2020-12-10-blog-post-1_files/summer%20image.jpg" style="width:80.0%" />
+</center>
 <div id="python-and-r-lets-close-the-gap" class="section level1">
 <h1>Python and R: Let's Close the Gap!</h1>
-<p>While both Python and R are really useful languages on their own, sometimes they work best together. In computational biology, it may be easier to visualize data through using &quot;reticulate&quot; so that Python and R can communicate with one another. It sounds challenging at first, but it's actually quite straightforward!</p>
+<p>While both Python and R are really useful languages on their own, sometimes they work best together.</p>
+<p>WOAH! Two programming languages at once?</p>
+<p>I know...sounds crazy but hear me out!</p>
+<p>In certain situations, it may be more convenient and easier to visualize and analyze data through using the &quot;reticulate&quot; function so that Python and R can communicate with one another. This allows objects in a different programming language to called upon as needed. It sounds challenging at first, but it's actually quite straightforward!</p>
 <p>We'll start of with a simple example!</p>
 <pre class="r"><code>#R Code Chuck 
 # &quot;reticulate&quot; is activated in R
@@ -83,15 +89,15 @@ library(reticulate)
 # the object seasons is defined
 seasons &lt;- &quot;There are four seasons.&quot;</code></pre>
 <pre class="python"><code>#Python Code Chuck
-seasons = &quot;I think summer is my favorite!&quot;
+seasons = &quot;I think summer is my favorite season!&quot;
 
 # r. allows Python to access R-defined objects
 print(r.seasons,seasons) </code></pre>
-<pre><code>## There are four seasons. I think summer is my favorite!</code></pre>
+<pre><code>## There are four seasons. I think summer is my favorite season!</code></pre>
 <p>We can also do the opposite and access Python defined objects in R!</p>
 <pre class="r"><code># py. allows R to access Python-defined objects
 cat(c(seasons,py$seasons))</code></pre>
-<pre><code>## There are four seasons. I think summer is my favorite!</code></pre>
+<pre><code>## There are four seasons. I think summer is my favorite season!</code></pre>
 </div>
 <div id="lets-do-some-modeling" class="section level1">
 <h1>Let's Do Some Modeling!</h1>
@@ -110,8 +116,7 @@ quakes.head()</code></pre>
 ## 5 -20.42  181.96    649  4.0        11</code></pre>
 <p>Now let's model that data in R! The code below will generate a histogram displaying the frequency of different depths of earthquakes near Fiji!</p>
 <pre class="r"><code># generates histogram of the &quot;depth&quot; variable from the quakes dataset
-
-hist(quakes$depth, xlab = &quot;Depth (km)&quot;, main = &quot;Distribution of Earthquake Depths near Fiji&quot;, right = F, col = &quot; dark red&quot;)</code></pre>
+hist(py$quakes$depth, xlab = &quot;Depth (km)&quot;, main = &quot;Distribution of Earthquake Depths near Fiji&quot;, right = F, col = &quot; dark red&quot;)</code></pre>
 <p><img src="../../../../../post/2020-12-10-blog-post-1_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>Based on the histogram, we can observe a biomodal distribution!</p>
 </div>
